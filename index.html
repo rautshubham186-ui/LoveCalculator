@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+  <!-- SEO meta is finalized by seo.js at runtime; these are safe static fallbacks. -->
+  <title>Love Calculator — Fun Love Match Percentage</title>
+  <meta name="description" content="Enter two names and reveal your love percentage. Original algorithm, full Unicode support, mobile-first, accessible, privacy-friendly." />
+  <link rel="canonical" href="https://example.com/love-calculator/" />
+  <meta name="robots" content="index,follow,max-image-preview:large" />
+  <meta name="theme-color" content="#fff5f8" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Love Calculator" />
+  <meta property="og:title" content="Love Calculator — Fun Love Match Percentage" />
+  <meta property="og:description" content="Enter two names and reveal your love percentage. Original algorithm, full Unicode support, mobile-first, accessible, privacy-friendly." />
+  <meta property="og:url" content="https://example.com/love-calculator/" />
+  <meta property="og:image" content="https://example.com/love-calculator/og-cover.png" />
+  <meta property="og:image:alt" content="Two names inside a glowing heart with a love percentage." />
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Love Calculator — Fun Love Match Percentage" />
+  <meta name="twitter:description" content="Enter two names and reveal your love percentage. Original algorithm, full Unicode support, mobile-first, accessible, privacy-friendly." />
+  <meta name="twitter:image" content="https://example.com/love-calculator/og-cover.png" />
+  <meta name="twitter:image:alt" content="Two names inside a glowing heart with a love percentage." />
+
+  <!-- Favicon (inline SVG heart) -->
+  <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path fill='%23d6336c' d='M16 28S4 19 4 11.5C4 7 7.5 4 11 4c2.2 0 4.1 1.1 5 2.7C16.9 5.1 18.8 4 21 4c3.5 0 7 3 7 7.5C28 19 16 28 16 28z'/></svg>" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&display=swap" />
+
+  <!-- App styles -->
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- Prevent theme flash: apply stored theme + palette before paint -->
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('lc-theme');
+        var theme = (stored === 'light' || stored === 'dark') ? stored : 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+        var palette = localStorage.getItem('lc-palette');
+        var validPalettes = ['rose', 'midnight', 'ocean', 'aurora', 'sunset'];
+        if (!palette || validPalettes.indexOf(palette) === -1) palette = 'rose';
+        document.documentElement.setAttribute('data-palette', palette);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'light');
+        document.documentElement.setAttribute('data-palette', 'rose');
+      }
+    })();
+  </script>
+</head>
+<body>
+  <!-- =================================================================
+       A. Header / Nav
+       ================================================================= -->
+  <header class="lc-header" role="banner">
+    <div class="lc-header__inner">
+      <a href="#top" class="lc-brand" aria-label="Love Calculator — home">
+        <span class="lc-brand__heart" aria-hidden="true"></span>
+        <span id="lc-brand">Love Calculator</span>
+      </a>
+      <nav class="lc-nav" aria-label="Primary">
+        <a href="#calculator" id="lc-nav-calculator">Love Calculator</a>
+        <a href="#faq" id="lc-nav-faq">Love Calculator FAQ</a>
+      </nav>
+      <div class="lc-header-controls">
+        <div class="lc-palette-picker" role="radiogroup" aria-label="Color theme">
+          <button type="button" class="lc-palette-swatch" data-palette="rose"    aria-label="Rose Romance palette"  style="--swatch-color:#d6336c"></button>
+          <button type="button" class="lc-palette-swatch" data-palette="sunset"  aria-label="Sunset Glow palette"   style="--swatch-color:#f97316"></button>
+        </div>
+        <button type="button" class="lc-theme-toggle" id="lc-theme-toggle" aria-label="Light / Dark. Click to change.">Light</button>
+        <button type="button" class="lc-share-site-btn" id="lc-share-site" aria-label="Share this website">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>
+          <span>Share</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Desktop sidebar ads (visible only on wide screens via CSS) -->
+  <aside class="lc-sidebar-ad lc-sidebar-ad--left" aria-label="Advertisement">
+    <span class="lc-ad-label">Advertisement</span>
+    <div class="lc-ad__slot"><!-- AdSense sidebar left — replace at deploy --></div>
+  </aside>
+  <aside class="lc-sidebar-ad lc-sidebar-ad--right" aria-label="Advertisement">
+    <span class="lc-ad-label">Advertisement</span>
+    <div class="lc-ad__slot"><!-- AdSense sidebar right — replace at deploy --></div>
+  </aside>
+
+  <main id="top">
+    <!-- =================================================================
+         B. Hero
+         ================================================================= -->
+    <section class="lc-hero" aria-labelledby="lc-hero-title">
+      <div class="lc-hero__deco" aria-hidden="true">
+        <span style="left:6%;  font-size:20px; animation-delay: 0s;">&#10084;</span>
+        <span style="left:14%; font-size:14px; animation-delay: 1.5s;">&#10084;</span>
+        <span style="left:24%; font-size:24px; animation-delay: 3s;">&#10084;</span>
+        <span style="left:78%; font-size:18px; animation-delay: 0.8s;">&#10084;</span>
+        <span style="left:88%; font-size:22px; animation-delay: 2.2s;">&#10084;</span>
+        <span style="left:92%; font-size:14px; animation-delay: 4s;">&#10084;</span>
+      </div>
+      <div class="lc-hero__inner">
+        <div class="lc-hero__visual" aria-hidden="true">
+          <svg class="lc-hero__heart-svg" viewBox="0 0 32 32">
+            <defs>
+              <linearGradient id="lc-heart-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="var(--lc-primary)"/>
+                <stop offset="100%" stop-color="var(--lc-accent)"/>
+              </linearGradient>
+              <filter id="lc-heart-glow">
+                <feGaussianBlur stdDeviation="2" result="blur"/>
+                <feMerge>
+                  <feMergeNode in="blur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
+            <path d="M16 28S4 19 4 11.5C4 7 7.5 4 11 4c2.2 0 4.1 1.1 5 2.7C16.9 5.1 18.8 4 21 4c3.5 0 7 3 7 7.5C28 19 16 28 16 28z"
+                  fill="url(#lc-heart-grad)" filter="url(#lc-heart-glow)"/>
+          </svg>
+        </div>
+        <p class="lc-hero__subtitle" id="lc-hero-subtitle">Discover your fun Love Match</p>
+        <h1 class="lc-hero__title" id="lc-hero-title">Love Calculator</h1>
+        <p class="lc-hero__desc" id="lc-hero-desc">Enter two names and reveal your love percentage — a moment worth sharing.</p>
+        <button type="button" class="lc-hero__cta" id="lc-hero-cta">
+          <span aria-hidden="true">&#10084;</span>
+          <span id="lc-hero-cta-text">Calculate Love</span>
+        </button>
+        <p class="lc-hero__cta-hint" id="lc-hero-cta-hint">Tap to enter names or scan thumbprints</p>
+        <p class="lc-hero__disclaimer" id="lc-hero-disclaimer">Not a scientific measure of real relationships.</p>
+      </div>
+    </section>
+
+    <!-- =================================================================
+         C. Calculator card
+         ================================================================= -->
+    <section class="lc-section lc-section--tight" id="calculator" aria-labelledby="lc-calculator-title">
+      <div class="lc-container">
+        <div class="lc-card lc-calculator" id="lc-calculator">
+          <h2 class="lc-calculator__title" id="lc-calculator-title">Love Calculator</h2>
+          <p class="lc-calculator__hint" id="lc-calc-intro">Enter two names, scan your thumbprints, or use both — any language, any script, any country. Then press Calculate Love.</p>
+
+          <form class="lc-form" id="lc-calc-form" novalidate>
+            <div class="lc-form-names" id="lc-form-names">
+              <div class="lc-field">
+                <label for="lc-name1">Your Name</label>
+                <div class="lc-input-wrap">
+                  <input
+                    type="text"
+                    id="lc-name1"
+                    name="name1"
+                    class="lc-input"
+                    placeholder="Type a name…"
+                    autocomplete="off"
+                    autocorrect="off"
+                    autocapitalize="words"
+                    spellcheck="false"
+                    maxlength="60"
+                    aria-describedby="lc-count1"
+                    enterkeyhint="next"
+                  />
+                  <button type="button" class="lc-input-clear" id="lc-name1-clear" aria-label="Clear first name">&times;</button>
+                </div>
+                <span class="lc-count" id="lc-count1" aria-live="polite">0 / 60 chars</span>
+              </div>
+
+              <div class="lc-field">
+                <label for="lc-name2">Partner&rsquo;s Name</label>
+                <div class="lc-input-wrap">
+                  <input
+                    type="text"
+                    id="lc-name2"
+                    name="name2"
+                    class="lc-input"
+                    placeholder="Type another name…"
+                    autocomplete="off"
+                    autocorrect="off"
+                    autocapitalize="words"
+                    spellcheck="false"
+                    maxlength="60"
+                    aria-describedby="lc-count2"
+                    enterkeyhint="go"
+                  />
+                  <button type="button" class="lc-input-clear" id="lc-name2-clear" aria-label="Clear second name">&times;</button>
+                </div>
+                <span class="lc-count" id="lc-count2" aria-live="polite">0 / 60 chars</span>
+              </div>
+            </div>
+
+            <div class="lc-form-thumb" id="lc-form-thumb">
+              <p class="lc-thumb-hint" id="lc-thumb-hint">You can use names, thumbprints, or both — whichever you like. Press each thumb pad briefly to scan.</p>
+              <div class="lc-thumbpads">
+                <div class="lc-thumbpad-wrap">
+                  <div class="lc-thumbpad" id="lc-thumb1" role="button" tabindex="0"
+                       aria-label="Person 1 thumbprint pad — press briefly to scan">
+                    <svg class="lc-thumbpad-svg" viewBox="0 0 200 240" aria-hidden="true">
+                      <defs>
+                        <linearGradient id="lc-thumb-grad-1" x1="0%" y1="0%" x2="0%" y2="100%">
+                          <stop offset="0%" stop-color="var(--lc-primary-soft)" stop-opacity="0.18"/>
+                          <stop offset="100%" stop-color="var(--lc-primary)" stop-opacity="0.06"/>
+                        </linearGradient>
+                        <clipPath id="lc-thumb-clip-1">
+                          <path d="M100 20 C60 20 40 55 40 100 C40 140 45 180 60 210 C70 228 85 235 100 235 C115 235 130 228 140 210 C155 180 160 140 160 100 C160 55 140 20 100 20 Z"/>
+                        </clipPath>
+                      </defs>
+                      <!-- Thumb-shaped body -->
+                      <path d="M100 20 C60 20 40 55 40 100 C40 140 45 180 60 210 C70 228 85 235 100 235 C115 235 130 228 140 210 C155 180 160 140 160 100 C160 55 140 20 100 20 Z"
+                            fill="url(#lc-thumb-grad-1)" stroke="var(--lc-border-strong)" stroke-width="2.5"/>
+                      <!-- Default fingerprint ridges (shown before scan) -->
+                      <g class="lc-thumb-ridges lc-thumb-ridges--default" data-target="1" clip-path="url(#lc-thumb-clip-1)">
+                        <path d="M100 60 Q70 65 65 90 Q60 120 68 155 Q75 185 88 210" fill="none" stroke="var(--lc-primary)" stroke-width="1.5" opacity="0.25"/>
+                        <path d="M100 55 Q65 60 58 90 Q52 125 62 162 Q70 192 85 215" fill="none" stroke="var(--lc-primary)" stroke-width="1.5" opacity="0.22"/>
+                        <path d="M100 50 Q60 55 51 90 Q44 130 56 170 Q66 200 82 222" fill="none" stroke="var(--lc-primary)" stroke-width="1.5" opacity="0.18"/>
+                        <path d="M100 65 Q75 70 72 90 Q68 120 75 150 Q82 178 92 200" fill="none" stroke="var(--lc-primary)" stroke-width="1.5" opacity="0.28"/>
+                        <path d="M100 70 Q80 75 78 92 Q75 118 80 145 Q86 172 95 195" fill="none" stroke="var(--lc-primary)" stroke-width="1.5" opacity="0.3"/>
+                        <path d="M100 75 Q85 80 84 94 Q82 115 86 140 Q91 165 98 188" fill="none" stroke="var(--lc-primary)" stroke-width="1.5" opacity="0.32"/>
+                        <path d="M100 80 Q90 84 90 96 Q88 113 92 135 Q96 158 100 180" fill="none" stroke="var(--lc-primary)" stroke-width="1.5" opacity="0.34"/>
+                        <path d="M100 85 Q95 88 96 98 Q95 110 98 130 Q100 152 103 172" fill="none" stroke="var(--lc-primary)" stroke-width="1.5" opacity="0.36"/>
+                        <path d="M100 90 Q100 92 102 100 Q102 110 104 125 Q106 145 108 162" fill="none" stroke="var(--lc-primary)" stroke-width="1.5" opacity="0.38"/>
+                        <path d="M100 95 Q103 97 106 102 Q108 112 110 122 Q112 138 113 155" fill="none" stroke="var(--lc-primary)" stroke-width="1.5" opacity="0.36"/>
+                        <!-- Central whorl -->
+                        <ellipse cx="100" cy="115" rx="14" ry="20" fill="none" stroke="var(--lc-primary)" stroke-width="1.5" opacity="0.4"/>
+                        <ellipse cx="100" cy="115" rx="8" ry="13" fill="none" stroke="var(--lc-primary)" stroke-width="1.5" opacity="0.42"/>
+                        <ellipse cx="100" cy="113" rx="3" ry="6" fill="none" stroke="var(--lc-primary)" stroke-width="1.5" opacity="0.44"/>
+                      </g>
+                      <!-- Scanned ridges (rendered by app.js after scan) -->
+                      <g class="lc-thumb-ridges lc-thumb-ridges--scanned" data-target="1" clip-path="url(#lc-thumb-clip-1)"></g>
+                      <!-- Scan line -->
+                      <line class="lc-thumb-scan" x1="40" x2="160" y1="120" y2="120" stroke="var(--lc-primary)" stroke-width="2.5" stroke-linecap="round" opacity="0"/>
+                      <!-- Label -->
+                      <text class="lc-thumb-text" x="100" y="125" text-anchor="middle" fill="var(--lc-text-muted)" font-size="13" font-weight="700" letter-spacing="2">TAP</text>
+                    </svg>
+                    <!-- Circular progress ring overlay (animates during scan) -->
+                    <svg class="lc-thumb-progress" viewBox="0 0 200 240" aria-hidden="true">
+                      <circle class="lc-thumb-progress-track" cx="100" cy="120" r="110" fill="none" stroke="var(--lc-border)" stroke-width="3" opacity="0.4"/>
+                      <circle class="lc-thumb-progress-fill" cx="100" cy="120" r="110" fill="none" stroke="var(--lc-primary)" stroke-width="3" stroke-linecap="round"/>
+                    </svg>
+                    <span class="lc-thumbpad-label" id="lc-thumb1-label">Press your thumb here</span>
+                    <span class="lc-thumbpad-status" id="lc-thumb1-status" aria-live="polite"></span>
+                  </div>
+                  <button type="button" class="lc-thumbpad-reset" id="lc-thumb1-reset" hidden>Re-scan</button>
+                </div>
+                <div class="lc-thumbpad-wrap">
+                  <div class="lc-thumbpad" id="lc-thumb2" role="button" tabindex="0"
+                       aria-label="Person 2 thumbprint pad — press briefly to scan">
+                    <svg class="lc-thumbpad-svg" viewBox="0 0 200 240" aria-hidden="true">
+                      <defs>
+                        <linearGradient id="lc-thumb-grad-2" x1="0%" y1="0%" x2="0%" y2="100%">
+                          <stop offset="0%" stop-color="var(--lc-primary-soft)" stop-opacity="0.18"/>
+                          <stop offset="100%" stop-color="var(--lc-primary)" stop-opacity="0.06"/>
+                        </linearGradient>
+                        <clipPath id="lc-thumb-clip-2">
+                          <path d="M100 20 C60 20 40 55 40 100 C40 140 45 180 60 210 C70 228 85 235 100 235 C115 235 130 228 140 210 C155 180 160 140 160 100 C160 55 140 20 100 20 Z"/>
+                        </clipPath>
+                      </defs>
+                      <path d="M100 20 C60 20 40 55 40 100 C40 140 45 180 60 210 C70 228 85 235 100 235 C115 235 130 228 140 210 C155 180 160 140 160 100 C160 55 140 20 100 20 Z"
+                            fill="url(#lc-thumb-grad-2)" stroke="var(--lc-border-strong)" stroke-width="2.5"/>
+                      <g class="lc-thumb-ridges lc-thumb-ridges--default" data-target="2" clip-path="url(#lc-thumb-clip-2)">
+                        <path d="M100 60 Q70 65 65 90 Q60 120 68 155 Q75 185 88 210" fill="none" stroke="var(--lc-primary)" stroke-width="1.5" opacity="0.25"/>
+                        <path d="M100 55 Q65 60 58 90 Q52 125 62 162 Q70 192 85 215" fill="none" stroke="var(--lc-primary)" stroke-width="1.5" opacity="0.22"/>
+                        <path d="M100 50 Q60 55 51 90 Q44 130 56 170 Q66 200 82 222" fill="none" stroke="var(--lc-primary)" stroke-width="1.5" opacity="0.18"/>
+                        <path d="M100 65 Q75 70 72 90 Q68 120 75 150 Q82 178 92 200" fill="none" stroke="var(--lc-primary)" stroke-width="1.5" opacity="0.28"/>
+                        <path d="M100 70 Q80 75 78 92 Q75 118 80 145 Q86 172 95 195" fill="none" stroke="var(--lc-primary)" stroke-width="1.5" opacity="0.3"/>
+                        <path d="M100 75 Q85 80 84 94 Q82 115 86 140 Q91 165 98 188" fill="none" stroke="var(--lc-primary)" stroke-width="1.5" opacity="0.32"/>
+                        <path d="M100 80 Q90 84 90 96 Q88 113 92 135 Q96 158 100 180" fill="none" stroke="var(--lc-primary)" stroke-width="1.5" opacity="0.34"/>
+                        <path d="M100 85 Q95 88 96 98 Q95 110 98 130 Q100 152 103 172" fill="none" stroke="var(--lc-primary)" stroke-width="1.5" opacity="0.36"/>
+                        <path d="M100 90 Q100 92 102 100 Q102 110 104 125 Q106 145 108 162" fill="none" stroke="var(--lc-primary)" stroke-width="1.5" opacity="0.38"/>
+                        <path d="M100 95 Q103 97 106 102 Q108 112 110 122 Q112 138 113 155" fill="none" stroke="var(--lc-primary)" stroke-width="1.5" opacity="0.36"/>
+                        <ellipse cx="100" cy="115" rx="14" ry="20" fill="none" stroke="var(--lc-primary)" stroke-width="1.5" opacity="0.4"/>
+                        <ellipse cx="100" cy="115" rx="8" ry="13" fill="none" stroke="var(--lc-primary)" stroke-width="1.5" opacity="0.42"/>
+                        <ellipse cx="100" cy="113" rx="3" ry="6" fill="none" stroke="var(--lc-primary)" stroke-width="1.5" opacity="0.44"/>
+                      </g>
+                      <g class="lc-thumb-ridges lc-thumb-ridges--scanned" data-target="2" clip-path="url(#lc-thumb-clip-2)"></g>
+                      <line class="lc-thumb-scan" x1="40" x2="160" y1="120" y2="120" stroke="var(--lc-primary)" stroke-width="2.5" stroke-linecap="round" opacity="0"/>
+                      <text class="lc-thumb-text" x="100" y="125" text-anchor="middle" fill="var(--lc-text-muted)" font-size="13" font-weight="700" letter-spacing="2">TAP</text>
+                    </svg>
+                    <!-- Circular progress ring overlay (animates during scan) -->
+                    <svg class="lc-thumb-progress" viewBox="0 0 200 240" aria-hidden="true">
+                      <circle class="lc-thumb-progress-track" cx="100" cy="120" r="110" fill="none" stroke="var(--lc-border)" stroke-width="3" opacity="0.4"/>
+                      <circle class="lc-thumb-progress-fill" cx="100" cy="120" r="110" fill="none" stroke="var(--lc-primary)" stroke-width="3" stroke-linecap="round"/>
+                    </svg>
+                    <span class="lc-thumbpad-label" id="lc-thumb2-label">Press your partner&rsquo;s thumb here</span>
+                    <span class="lc-thumbpad-status" id="lc-thumb2-status" aria-live="polite"></span>
+                  </div>
+                  <button type="button" class="lc-thumbpad-reset" id="lc-thumb2-reset" hidden>Re-scan</button>
+                </div>
+              </div>
+            </div>
+
+            <button type="button" class="lc-calc-btn" id="lc-calc-btn">
+              <span aria-hidden="true">&#10084;</span>
+              <span id="lc-calc-btn-text">Calculate Love</span>
+            </button>
+            <p class="lc-form-hint" id="lc-calc-hint">Press this big pink button when you&rsquo;re ready. Your result appears below.</p>
+          </form>
+          <!-- Ad slot inside calculator card (after Calculate button) -->
+          <aside class="lc-ad lc-ad--inline" aria-label="Advertisement">
+            <span class="lc-ad-label">Advertisement</span>
+            <div class="lc-ad__slot"><!-- AdSense slot — after Calculate button — replace at deploy --></div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================
+         E. First advertisement area
+         ================================================================= -->
+    <aside class="lc-ad lc-ad--leaderboard" aria-label="Advertisement">
+      <span class="lc-ad-label">Advertisement</span>
+      <div class="lc-ad__slot"><!-- AdSense slot 1 — replace with <ins class="adsbygoogle" ...></ins> at deploy --></div>
+    </aside>
+
+    <!-- =================================================================
+         F. Result section (empty / loading / result)
+         ================================================================= -->
+    <section class="lc-section lc-section--tight" aria-labelledby="lc-result-heading">
+      <h2 class="lc-sr-only" id="lc-result-heading">Your Love Calculator result</h2>
+      <div class="lc-container">
+        <div class="lc-result-wrap">
+
+          <!-- Empty state -->
+          <div class="lc-empty" id="lc-empty" role="status">
+            <div class="lc-empty__heart" aria-hidden="true"></div>
+            <h3 class="lc-empty__title" id="lc-empty-title">Your result is waiting &#10084;</h3>
+            <p class="lc-empty__hint" id="lc-empty-hint">Enter two names above and press Calculate Love.</p>
+          </div>
+
+          <!-- Loading state -->
+          <div class="lc-loading" id="lc-loading" role="status" aria-live="polite" hidden>
+            <div class="lc-loading__heart" aria-hidden="true"></div>
+            <h3 class="lc-loading__title" id="lc-loading-title">Reading the stars of your names<span class="lc-loading__dots" aria-hidden="true"><span></span><span></span><span></span></span></h3>
+            <p class="lc-loading__hint" id="lc-loading-hint">Just a moment.</p>
+          </div>
+
+          <!-- Result -->
+          <div class="lc-result" id="lc-result" hidden>
+            <div class="lc-result__names" id="lc-result-names" aria-label="Names"></div>
+
+            <div class="lc-score-wrap">
+              <svg class="lc-score-ring" viewBox="0 0 220 220" aria-hidden="true">
+                <circle class="lc-score-ring__bg" cx="110" cy="110" r="90" />
+                <circle class="lc-score-ring__fg" id="lc-progress-ring-fg" cx="110" cy="110" r="90" />
+              </svg>
+              <div class="lc-score-center">
+                <span class="lc-score" id="lc-score">0<span class="lc-score-percent">%</span></span>
+                <span class="lc-score-label" id="lc-score-label">Love Match</span>
+              </div>
+            </div>
+
+            <h3 class="lc-result__title" id="lc-result-title"></h3>
+            <p class="lc-result__paragraph" id="lc-result-paragraph"></p>
+
+            <!-- G. Compatibility breakdown (collapsible) -->
+            <div class="lc-breakdown-wrap" id="lc-breakdown-wrap">
+              <button type="button" class="lc-breakdown-toggle" id="lc-breakdown-toggle" aria-expanded="false" aria-controls="lc-breakdown">
+                <span id="lc-breakdown-title">Fun Compatibility Breakdown</span>
+                <span class="lc-breakdown-toggle-icon" aria-hidden="true">+</span>
+              </button>
+              <div class="lc-breakdown" id="lc-breakdown" aria-label="Fun compatibility breakdown" hidden></div>
+            </div>
+
+            <p class="lc-challenge" id="lc-challenge">Want to challenge your friend? &#10084;</p>
+
+            <!-- H. Share / copy / reset controls (compact icon buttons) -->
+            <div class="lc-result-actions lc-result-actions--compact">
+              <button type="button" class="lc-icon-btn lc-icon-btn--primary" id="lc-share"
+                      title="Share Result" aria-label="Share Result">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>
+              </button>
+              <button type="button" class="lc-icon-btn" id="lc-copy"
+                      title="Copy Result" aria-label="Copy Result">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+              </button>
+              <span class="lc-action-divider" aria-hidden="true"></span>
+              <button type="button" class="lc-icon-btn" id="lc-try-again"
+                      title="Calculate Again" aria-label="Calculate Again">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+              </button>
+              <button type="button" class="lc-icon-btn" id="lc-new-names"
+                      title="New Names" aria-label="New Names">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+              </button>
+              <button type="button" class="lc-icon-btn" id="lc-reset"
+                      title="Reset" aria-label="Reset">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+              </button>
+            </div>
+
+            <!-- I2. Past / Present / Future love timeline -->
+            <div class="lc-timeline" id="lc-timeline" aria-labelledby="lc-timeline-title">
+              <div class="lc-timeline__head">
+                <h3 class="lc-timeline__title" id="lc-timeline-title">Your Love Timeline</h3>
+                <p class="lc-timeline__sub" id="lc-timeline-sub"></p>
+              </div>
+              <div class="lc-timeline__grid">
+                <article class="lc-timeline-card lc-timeline-card--past" id="lc-timeline-past">
+                  <div class="lc-timeline-card__phase" id="lc-timeline-past-phase">Past</div>
+                  <div class="lc-timeline-card__score-wrap">
+                    <span class="lc-timeline-card__score" id="lc-timeline-past-score">0%</span>
+                  </div>
+                  <h4 class="lc-timeline-card__title" id="lc-timeline-past-title"></h4>
+                  <p class="lc-timeline-card__hint" id="lc-timeline-past-hint"></p>
+                  <p class="lc-timeline-card__para" id="lc-timeline-past-para"></p>
+                </article>
+                <article class="lc-timeline-card lc-timeline-card--present" id="lc-timeline-present">
+                  <div class="lc-timeline-card__phase" id="lc-timeline-present-phase">Present</div>
+                  <div class="lc-timeline-card__score-wrap">
+                    <span class="lc-timeline-card__score" id="lc-timeline-present-score">0%</span>
+                  </div>
+                  <h4 class="lc-timeline-card__title" id="lc-timeline-present-title"></h4>
+                  <p class="lc-timeline-card__hint" id="lc-timeline-present-hint"></p>
+                  <p class="lc-timeline-card__para" id="lc-timeline-present-para"></p>
+                </article>
+                <article class="lc-timeline-card lc-timeline-card--future" id="lc-timeline-future">
+                  <div class="lc-timeline-card__phase" id="lc-timeline-future-phase">Future</div>
+                  <div class="lc-timeline-card__score-wrap">
+                    <span class="lc-timeline-card__score" id="lc-timeline-future-score">0%</span>
+                  </div>
+                  <h4 class="lc-timeline-card__title" id="lc-timeline-future-title"></h4>
+                  <p class="lc-timeline-card__hint" id="lc-timeline-future-hint"></p>
+                  <p class="lc-timeline-card__para" id="lc-timeline-future-para"></p>
+                </article>
+              </div>
+            </div>
+          </div>
+
+          <!-- SR-only result announcement -->
+          <div class="lc-sr-only" id="lc-sr-result" role="status" aria-live="polite"></div>
+
+          <!-- Ad slot inside result section (after timeline) -->
+          <aside class="lc-ad lc-ad--inline" aria-label="Advertisement">
+            <span class="lc-ad-label">Advertisement</span>
+            <div class="lc-ad__slot"><!-- AdSense slot — inside result — replace at deploy --></div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================
+         K. FAQ
+         ================================================================= -->
+    <section class="lc-section" id="faq" aria-labelledby="lc-faq-title">
+      <div class="lc-container">
+        <div class="lc-section__head">
+          <h2 id="lc-faq-title">Frequently Asked Questions</h2>
+        </div>
+        <div class="lc-faq-list" id="lc-faq-list"></div>
+      </div>
+    </section>
+
+    <!-- =================================================================
+         N. Second advertisement area
+         ================================================================= -->
+    <aside class="lc-ad lc-ad--rectangle" aria-label="Advertisement">
+      <span class="lc-ad-label">Advertisement</span>
+      <div class="lc-ad__slot"><!-- AdSense slot 2 — replace at deploy --></div>
+    </aside>
+
+    <!-- =================================================================
+         O. Additional educational / search-intent content
+         ================================================================= -->
+    <section class="lc-section" aria-labelledby="lc-edu-title">
+      <div class="lc-container">
+        <div class="lc-edu">
+          <div class="lc-section__head" style="text-align:left;">
+            <h2 id="lc-edu-title">About Love Calculators</h2>
+            <p class="lc-section__lead" id="lc-edu-lead"></p>
+          </div>
+
+          <h2 id="lc-edu-h2-what">What is a love calculator, really?</h2>
+          <p id="lc-edu-p-what"></p>
+
+          <h2 id="lc-edu-h2-why">Why do people enjoy them?</h2>
+          <p id="lc-edu-p-why"></p>
+
+          <h2 id="lc-edu-h2-limit">What a love calculator cannot do</h2>
+          <p id="lc-edu-p-limit"></p>
+
+          <h2 id="lc-edu-h2-real">What actually makes a relationship work</h2>
+          <p id="lc-edu-p-real"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================
+         P. Third advertisement area
+         ================================================================= -->
+    <aside class="lc-ad lc-ad--leaderboard" aria-label="Advertisement">
+      <span class="lc-ad-label">Advertisement</span>
+      <div class="lc-ad__slot"><!-- AdSense slot 3 — replace at deploy --></div>
+    </aside>
+  </main>
+
+  <!-- =================================================================
+       Modal panel for footer link content (About / Privacy / Terms / Contact / Disclaimer)
+       ================================================================= -->
+  <div class="lc-tab-modal" id="lc-tab-modal" hidden role="dialog" aria-modal="true" aria-labelledby="lc-tab-modal-title">
+    <div class="lc-tab-modal__backdrop" id="lc-tab-modal-backdrop"></div>
+    <div class="lc-tab-modal__panel">
+      <div class="lc-tab-modal__header">
+        <h2 class="lc-tab-modal__title" id="lc-tab-modal-title"></h2>
+        <button type="button" class="lc-tab-modal__close" id="lc-tab-modal-close" aria-label="Close">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </div>
+      <div class="lc-tab-modal__body" id="lc-tab-modal-body"></div>
+    </div>
+  </div>
+
+  <!-- =================================================================
+       Q. Footer
+       ================================================================= -->
+  <footer class="lc-footer" role="contentinfo">
+    <div class="lc-footer__inner">
+      <div class="lc-footer__brand">
+        <span id="lc-brand-footer">Love Calculator</span>
+      </div>
+      <p class="lc-footer__tagline" id="lc-footer-tagline">Made with care for a connected world.</p>
+      <nav class="lc-footer__links" aria-label="Footer">
+        <a href="javascript:void(0)" data-tab="about" id="lc-footer-about">About</a>
+        <a href="javascript:void(0)" data-tab="privacy" id="lc-footer-privacy">Privacy</a>
+        <a href="javascript:void(0)" data-tab="terms" id="lc-footer-terms">Terms</a>
+        <a href="javascript:void(0)" data-tab="contact" id="lc-footer-contact">Contact</a>
+        <a href="javascript:void(0)" data-tab="disclaimer" id="lc-footer-disclaimer">Disclaimer</a>
+      </nav>
+      <p class="lc-footer__contact-line">
+        Maintained by <strong>Shubham Raut</strong> &middot; <a href="mailto:rautshubham186@gmail.com">rautshubham186@gmail.com</a>
+      </p>
+      <p class="lc-footer__copy">
+        &copy; <span id="lc-year">2026</span> Love Calculator. The percentage is generated by a name-based algorithm and is not a scientific measurement of love, compatibility, personality, or relationship success.
+      </p>
+    </div>
+  </footer>
+
+  <!-- Toast -->
+  <div class="lc-toast" id="lc-toast" role="status" aria-live="polite"></div>
+
+  <!-- =================================================================
+       Scripts — order matters.
+       translations.js exposes LoveCalc.i18n (used by international.js for fallback text).
+       international.js exposes LoveCalc.international (used by calculator.js).
+       calculator.js exposes LoveCalc.calculator (used by app.js).
+       animation.js, theme.js, sharing.js, seo.js are independent.
+       app.js is last; it wires everything to the DOM.
+       ================================================================= -->
+  <script src="js/translations.js?v=20" defer></script>
+  <script src="js/international.js?v=20" defer></script>
+  <script src="js/calculator.js?v=20" defer></script>
+  <script src="js/animation.js?v=20" defer></script>
+  <script src="js/theme.js?v=20" defer></script>
+  <script src="js/sharing.js?v=20" defer></script>
+  <script src="js/seo.js?v=20" defer></script>
+  <script src="js/app.js?v=20" defer></script>
+
+  <script>
+    // Set current year in footer
+    document.addEventListener('DOMContentLoaded', function () {
+      var y = document.getElementById('lc-year');
+      if (y) y.textContent = String(new Date().getFullYear());
+    });
+  </script>
+</body>
+</html>
