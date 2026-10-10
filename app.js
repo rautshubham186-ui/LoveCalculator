@@ -1320,9 +1320,10 @@
     setText($('#lc-footer-contact'), t('footer.contact'));
     setText($('#lc-footer-disclaimer'), t('footer.disclaimer'));
 
-    // Brand
-    setText($('#lc-brand'), t('brand.tool'));
-    setText($('#lc-brand-footer'), t('brand.tool'));
+  
+// Brand
+setText($('#lc-brand'), 'Love Calculator');
+setText($('#lc-brand-footer'), 'Love Calculator');
 
     // Ad labels
     $all('.lc-ad-label').forEach(function (el) { setText(el, t('adLabel')); });
